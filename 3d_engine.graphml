@@ -14,27 +14,8 @@
   <key for="edge" id="d10" yfiles.type="edgegraphics"/>
   <graph edgedefault="directed" id="G">
     <data key="d0"><![CDATA[create 3d engine]]></data>
-    <node id="n0">
-      <data key="d4"><![CDATA[D:\development\Docs\TechnicalTask\1.odt]]></data>
-      <data key="d5"><![CDATA[technical task]]></data>
-      <data key="d6">
-        <y:GenericNode configuration="BevelNodeWithShadow">
-          <y:Geometry height="40.0" width="43.361328125" x="-231.6806640625" y="-320.0"/>
-          <y:Fill color="#FF9900" transparent="false"/>
-          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="custom" textColor="#000000" visible="true" width="33.361328125" x="5.0" y="10.6494140625">begin<y:LabelModel>
-              <y:SmartNodeLabelModel distance="4.0"/>
-            </y:LabelModel>
-            <y:ModelParameter>
-              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
-            </y:ModelParameter>
-          </y:NodeLabel>
-        </y:GenericNode>
-      </data>
-    </node>
-    <node id="n1" yfiles.foldertype="folder">
-      <data key="d4"/>
-      <data key="d5"/>
+    <node id="n0" yfiles.foldertype="folder">
+      <data key="d4"><![CDATA[.\Docs\Project\1.Implementation.odt]]></data>
       <data key="d6">
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="1">
@@ -50,7 +31,7 @@
               <y:BorderInsets bottom="0" bottomF="0.0" left="0" leftF="0.0" right="0" rightF="0.0" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
-              <y:Geometry height="40.0" width="83.19189453125" x="-251.595947265625" y="-235.40540624999988"/>
+              <y:Geometry height="40.0" width="83.19189453125" x="-401.595947265625" y="-320.0"/>
               <y:Fill color="#F2F0D8" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#B7B69E" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="83.19189453125" x="0.0" y="0.0">implement</y:NodeLabel>
@@ -63,17 +44,17 @@
           </y:Realizers>
         </y:ProxyAutoBoundsNode>
       </data>
-      <graph edgedefault="directed" id="n1:"/>
+      <graph edgedefault="directed" id="n0:"/>
     </node>
-    <node id="n2">
-      <data key="d4"><![CDATA[.\Docs\common.odt]]></data>
-      <data key="d5"/>
+    <node id="n1">
+      <data key="d4"><![CDATA[.\Docs\structure.odt]]></data>
       <data key="d6">
-        <y:GenericNode configuration="com.yworks.flowchart.cloud">
-          <y:Geometry height="50.0" width="148.37890625" x="-429.974853515625" y="-320.0"/>
-          <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
-          <y:BorderStyle color="#000000" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="18.701171875" modelName="custom" textColor="#000000" visible="true" width="111.37890625" x="18.5" y="15.6494140625">common description<y:LabelModel>
+        <y:GenericNode configuration="BevelNodeWithShadow">
+          <y:Geometry height="40.0" width="84.03125" x="-402.015625" y="-590.0"/>
+          <y:Fill color="#FF9900" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" modelName="custom" textColor="#000000" visible="true" width="66.021484375" x="9.0048828125" y="3.298828125">structure &amp;
+instruments<y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
             <y:ModelParameter>
@@ -83,7 +64,65 @@
         </y:GenericNode>
       </data>
     </node>
-    <edge id="e0" source="n0" target="n1">
+    <node id="n2">
+      <data key="d4"><![CDATA[.\Docs\TechnicalTask\1.Description.odt]]></data>
+      <data key="d6">
+        <y:GenericNode configuration="BevelNodeWithShadow">
+          <y:Geometry height="40.0" width="84.03125" x="-402.015625" y="-500.0"/>
+          <y:Fill color="#FF9900" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" modelName="custom" textColor="#000000" visible="true" width="74.03125" x="5.0" y="3.298828125">description &amp;
+requirements<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+        </y:GenericNode>
+      </data>
+    </node>
+    <node id="n3">
+      <data key="d4"><![CDATA[.\Docs\TechnicalTask\2.Beginning.odt]]></data>
+      <data key="d6">
+        <y:GenericNode configuration="BevelNodeWithShadow">
+          <y:Geometry height="40.0" width="83.611572265625" x="-402.015625" y="-410.0"/>
+          <y:Fill color="#FF9900" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" modelName="custom" textColor="#000000" visible="true" width="44.69921875" x="19.4561767578125" y="3.298828125">begin &amp;
+tasks<y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+        </y:GenericNode>
+      </data>
+    </node>
+    <edge id="e0" source="n1" target="n2">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e1" source="n2" target="n3">
+      <data key="d9"/>
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="standard"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e2" source="n3" target="n0">
       <data key="d9"/>
       <data key="d10">
         <y:PolyLineEdge>
