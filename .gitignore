@@ -1,3 +1,14 @@
 .*
 ~*
 $*
+*.opensdf
+*.exe
+*.pdb
+*.*log
+*.sdf
+*.obj
+*.dll
+*.user
+*.*filters
+*.ilk
+*.idb
