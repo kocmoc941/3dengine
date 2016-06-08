@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
   }
   strcpy(DLL, argv[1]);
   DWORD att = GetFileAttributesA(DLL);
-  if (att >= 0) {
+  if (att != INVALID_FILE_ATTRIBUTES) {
     HMODULE h = LoadLibraryA(DLL);
     if (h) {
       HWND(*call)(int a, int b);

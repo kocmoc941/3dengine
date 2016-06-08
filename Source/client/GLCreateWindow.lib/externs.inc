@@ -1,0 +1,3 @@
+EXTERN ExitProcess
+EXTERN CreateWindowExA
+EXTERN RegisterClassExA

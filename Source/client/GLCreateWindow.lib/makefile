@@ -1,11 +1,11 @@
-.PHONY = USAGE compile clean
+.PHONY = USAGE compile clean rebuild
 
 COMPILER = nasm.exe
 CFLAGS   = -fwin32
 
 LINKER = golink.exe
 LFLAGS = /dll /entry DLLMain /fo $@
-EXPORTDLL = kernel32.dll
+EXPORTDLL = kernel32.dll user32.dll
 
 OBJFILE = cogl.obj
 OUTFILE = ../bin/cogl_golink.dll
@@ -17,10 +17,12 @@ USAGE:
 compile: $(OUTFILE)
 
 $(OUTFILE) : $(OBJFILE)
-  $(LINKER) $? $(LFLAGS) $(EXPORTDLL)
+  @$(LINKER) $? $(LFLAGS) $(EXPORTDLL)
   
 $(OBJFILE) : main.asm
-  $(COMPILER) $(CFLAGS) $? -o$@
+  @$(COMPILER) $(CFLAGS) $? -o$@
   
 clean:
   rm -rdf *.obj *.dll
+
+rebuild: clean compile
