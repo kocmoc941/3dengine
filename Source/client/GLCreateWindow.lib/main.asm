@@ -10,8 +10,9 @@ segment .data use32 align=1
   cl_name db '__unique_class_name_cogl_creator__',0
   wn_name db '3D Engine',0
   msgerr:
-    .register: db 'RegisterClassExA', 0
+    .register: db 'RegisterClassExA',0
     .window: db 'CreateWindowExA',0
+    .unregister: db 'UnregisterClassA',0
     
   wnd_size equ dword WNDCLASSEX.wndsize
 
@@ -38,7 +39,7 @@ MSG:
   .pt resd 1
   
 segment .text use32 align=1
-DLLMain:
+DLLMain: ; histance/reason/reserved
   cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
   jne dllexit
     mov eax, [esp+16]
@@ -72,14 +73,30 @@ InitWndClass:
   leave
   ret
   
+UnloadClass:
+  ;push cl_name
+  ;push WNDCLASSEX.hInstance
+  ;call [UnregisterClassA]
+  ;push 0
+  ;push 0
+  ;push msgerr.unregister
+  ;push 0
+  ;test eax, eax
+  ;jz error.msgbox
+  ;mov eax, esp
+  ;add eax, 12
+  ;mov esp, eax
+  ret
+  
 GLCreateWindow: ; one param - lpfnWndProc
   push ebp
   mov ebp, esp
+
   call InitWndClass
   push WNDCLASSEX
   call [RegisterClassExA]
   test eax,eax
-  jz error.reg
+  jz error.unreg
 
   push 0 ; lpparam
   push dword [WNDCLASSEX.hInstance]
@@ -105,10 +122,11 @@ GLCreateWindow: ; one param - lpfnWndProc
     ret
 
   error:
+    .unreg:
+      push dword exit
+      ;jmp UnloadClass
+      ret
     .reg:
-      push cl_name
-      push WNDCLASSEX.hInstance
-      call [UnregisterClassA]
       push 0
       push 0
       push msgerr.register
