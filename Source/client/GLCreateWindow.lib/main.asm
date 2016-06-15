@@ -91,13 +91,12 @@ UnloadClass:
 GLCreateWindow: ; one param - lpfnWndProc
   push ebp
   mov ebp, esp
-
   call InitWndClass
   push WNDCLASSEX
   call [RegisterClassExA]
+jmp error.unreg
   test eax,eax
   jz error.unreg
-
   push 0 ; lpparam
   push dword [WNDCLASSEX.hInstance]
   push 0 ; menu
@@ -106,7 +105,7 @@ GLCreateWindow: ; one param - lpfnWndProc
   push 1024 ; width
   push 10 ; y
   push 10 ; x
-  mov eax, 0x00000000 ; overlaooed
+  mov eax, 0x00000000 ; overload
   push eax ; style
   push wn_name
   push cl_name
@@ -123,9 +122,8 @@ GLCreateWindow: ; one param - lpfnWndProc
 
   error:
     .unreg:
-      push dword exit
       ;jmp UnloadClass
-      ret
+      jmp .msgbox
     .reg:
       push 0
       push 0
