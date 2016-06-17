@@ -1,19 +1,26 @@
 
+; graphical module for opengl rendering
+; calling convention is stdcall
+
 %INCLUDE "externs.inc"
 
 GLOBAL DLLMain
 EXPORT GLCreateWindow
+EXPORT GLMainLoop
+EXPORT GetScreenWH
 
 %define wndeax(arg) mov [WNDCLASSEX.%+arg], eax
 
 segment .data use32 align=1
+  hwnd: dd 0
   cl_name db '__unique_class_name_cogl_creator__',0
   wn_name db '3D Engine',0
   msgerr:
     .register: db 'RegisterClassExA',0
     .window: db 'CreateWindowExA',0
     .unregister: db 'UnregisterClassA',0
-    
+    .destroy: db 'DestroyWindow',0
+
   wnd_size equ dword WNDCLASSEX.wndsize
 
 segment .bss use32 align=1
@@ -29,7 +36,7 @@ WNDCLASSEX:
 	.lpszClassName resd 1
 	.hIconSm resd 1
   .wndsize equ $-WNDCLASSEX
-  
+
 MSG:
   .hwnd resd 1
   .message resd 1
@@ -37,32 +44,30 @@ MSG:
   .lParam resd 1
   .time resd 1
   .pt resd 1
-  
+
 segment .text use32 align=1
-DLLMain: ; histance/reason/reserved
+DLLMain: ; params: histance/reason/reserved
   cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
   jne dllexit
-    mov eax, [esp+16]
+    mov eax, [esp+8]
     mov [WNDCLASSEX.hInstance], eax
   dllexit:
     xor eax, eax
     sete al
-    ret 12
+    retn 12
 
 InitWndClass:
-  push ebp
-  mov ebp, esp
   mov eax, wnd_size
   wndeax(cbSize)
   mov eax, 0x0002 ;CS_HREDRAW
   or eax, 0x0001  ;CS_VREDRAW
   wndeax(cbStyle)
-  mov eax, [esp+16] ; lpfnWndProc
+  mov eax, [esp+12] ; lpfnWndProc
   wndeax(lpfnWndProc)
   xor eax, eax
   wndeax(cbClsExtra)
   wndeax(cbWndExtra)
-;  wndeax(hInstance) ; in DLLMain
+;  wndeax(hInstance) ; receive from in DLLMain
   wndeax(hIcCurBr)
   wndeax(lpszMenuName)
   wndeax(lpszMenuName)
@@ -70,31 +75,71 @@ InitWndClass:
   wndeax(lpszClassName)
   xor eax, eax
   wndeax(hIconSm)
-  leave
-  ret
-  
+  retn
+
 UnloadClass:
-  ;push cl_name
-  ;push WNDCLASSEX.hInstance
-  ;call [UnregisterClassA]
-  ;push 0
-  ;push 0
-  ;push msgerr.unregister
-  ;push 0
-  ;test eax, eax
-  ;jz error.msgbox
-  ;mov eax, esp
-  ;add eax, 12
-  ;mov esp, eax
+  push cl_name
+  push WNDCLASSEX.hInstance
+  call [UnregisterClassA]
+  push 0
+  push 0
+  push msgerr.unregister
+  push 0
+  test eax, eax
+  jz error.msgbox
+  mov eax, esp
+  add eax, 16
+  mov esp, eax
+  retn
+
+GLMainLoop:
+  push 0
+  push 0
+  push 0
+  push MSG
+  call [GetMessageA]
+  test eax, eax
+  jz GLMainLoop_exit
+    cmp dword [MSG.message], 0x0002 ; WM_DESTROY
+    jz GLDestroy
+    push MSG
+    call [TranslateMessage]
+    push MSG
+    call [DispatchMessageA]
+  jmp GLMainLoop
+  GLMainLoop_exit:
+  retn
+
+  GLDestroy:
+    push dword [hwnd]
+    call [DestroyWindow]
+    test eax, eax
+    jz error.dest
+    jmp GLMainLoop_exit
+
+GetScreenWH:
+  mov ebx, 1; error
+  push 17 ; SM_CXFULLSCREEN
+  call [GetSystemMetrics]
+  test eax, eax
+  jz next_exit
+  mov ecx, eax
+  push 16 ; SM_CYFULLSCREEN
+  call [GetSystemMetrics]
+  test eax, eax
+  jz next_exit
+ 
+  xor ebx, ebx ; success
+  next_exit:
+  xchg eax, ebx
   ret
-  
+
 GLCreateWindow: ; one param - lpfnWndProc
   push ebp
   mov ebp, esp
   call InitWndClass
   push WNDCLASSEX
   call [RegisterClassExA]
-jmp error.unreg
   test eax,eax
   jz error.unreg
   push 0 ; lpparam
@@ -106,23 +151,32 @@ jmp error.unreg
   push 10 ; y
   push 10 ; x
   mov eax, 0x00000000 ; overload
+  or eax, 0x00080000 ; SYSMENU
   push eax ; style
   push wn_name
   push cl_name
-  mov eax, 00000200h ; clientedge
-  or eax, 00000100h ; windowdedge
+  mov eax, 0200h ; clientedge
+  or eax, 0100h ; windowdedge
   push eax ; dwexstyle
   call [CreateWindowExA]
   test eax, eax
   jz error.wnd
 
+  mov [hwnd], eax
+
   exit:
-    leave  
-    ret
+    leave
+    retn 4
 
   error:
+    .dest:
+      push 0
+      push 0
+      push msgerr.destroy
+      push 0
+      jmp .msgbox    
     .unreg:
-      ;jmp UnloadClass
+      call UnloadClass
       jmp .msgbox
     .reg:
       push 0
@@ -138,5 +192,5 @@ jmp error.unreg
       jmp .msgbox
     .msgbox:
       call [MessageBoxA]
-      call [GetLastError]
+      xor eax, eax
     jmp exit

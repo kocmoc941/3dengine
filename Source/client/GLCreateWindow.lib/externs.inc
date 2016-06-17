@@ -7,3 +7,8 @@ EXTERN MessageBoxA
 EXTERN UnregisterClassA
 EXTERN GetLastError
 EXTERN GetModuleHandleA
+EXTERN GetMessageA
+EXTERN TranslateMessage
+EXTERN DispatchMessageA
+EXTERN DestroyWindow
+EXTERN GetSystemMetrics

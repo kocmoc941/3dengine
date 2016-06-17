@@ -11,9 +11,14 @@ LRESULT CALLBACK WindowProc(
   _In_ LPARAM lParam
   ) {
   switch (uMsg) {
+     case WM_CLOSE:
+         PostMessageA(hwnd, WM_DESTROY, 0, 0);
+         return 0;
+       break;
     case WM_KEYDOWN:
       if (wParam == VK_ESCAPE) {
-        PostQuitMessage(0);
+        PostMessageA(hwnd, WM_DESTROY, 0, 0);
+        return 0;
       }
       break;
     case WM_PAINT:
@@ -43,22 +48,33 @@ int main(int argc, char** argv) {
   if (att != INVALID_FILE_ATTRIBUTES) {
     HMODULE h = LoadLibraryA(DLL);
     if (h) {
-      HWND(*call)(WNDPROC);
-      call = (HWND(*)(WNDPROC))GetProcAddress(h, argv[2]);
+      HWND(_stdcall*call)(WNDPROC);
+      call = (HWND(_stdcall*)(WNDPROC))GetProcAddress(h, argv[2]);
       if (call) {
         HWND hwnd = call(WindowProc);
         if (hwnd) {
           ShowWindow(hwnd, SW_SHOW);
-          MSG msg;
-          while (GetMessageA(&msg, 0, 0, 0)) {
-            if (msg.message == WM_QUIT)
-              break;
-            TranslateMessage(&msg);
-            DispatchMessageA(&msg);
+
+          bool(_fastcall *GetWH)();
+          GetWH = (bool(_fastcall*)())GetProcAddress(h, "GetScreenWH");
+          unsigned int X = 0, Y = 0;
+          bool ret = GetWH();
+          _asm {
+            mov X, ebx
+            mov Y, ecx
           }
+
+          std::cout << "GetScreenWH returned: " << ret << std::endl;
+          std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
+
+          void(_stdcall*GLMainLoop)();
+          GLMainLoop = (void(_stdcall*)())GetProcAddress(h, "GLMainLoop");
+          if (GLMainLoop)
+            GLMainLoop();
+          else
+            std::cout << "GLMainLoop not found\n";
         }
-        std::cout << "returned: " << hwnd;
-        std::cout << "\n";
+        std::cout << argv[2] << " returned: " << hwnd;
       }
       else
         std::cout << argv[2] << " not found\n";
