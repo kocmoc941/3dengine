@@ -305,3 +305,304 @@ Skip leading zeros in hex numbers=1
 
 --------------------------------------------------------------
 
+OLLYDBG EXCEPTION PROTOCOL
+
+This file is created by OllyDbg due to unrecoverable error. It
+contains data necessary to locate and remove this and previous
+errors. Please describe circumstances that preceded exception:
+
+>
+>
+>
+>
+
+and email protocol to:
+
+   Ollydbg@t-online.de
+
+Feel free to remove any private data. Thank you for your help!
+
+Operating system:   6.1.7601, platform 2 (S)
+OllyDbg version:    2.01.00 alpha 3
+Exception code:     C0000005
+Parameters:         00000000 00000004
+Exception address:  77102A62
+
+EAX=00301038  EBX=00300FF8  ECX=00000000  EDX=00000000
+ESP=0206FD20  EBP=0206FD48  ESI=00301030  EDI=002B0000
+EIP=77102A62  EFL=00010246
+
+Code dump:
+77102A22  14 22 47 52  32 46 02 A8  01 0F 85 5F  01 00 00 83
+77102A32  7F 4C 00 74  16 8B 47 50  31 06 8A 46  01 32 06 32
+77102A42  46 02 38 46  03 0F 85 51  75 05 00 80  7D 14 00 0F
+77102A52  85 55 75 05  00 8B 56 0C  8D 46 08 8B  08 89 4D F0
+77102A62> 8B 49 04 89  55 F4 8B 12  3B D1 0F 85  6F 5A 00 00
+77102A72  3B D0 0F 85  67 5A 00 00  0F B7 06 29  47 78 8B 87
+77102A82  B8 00 00 00  85 C0 0F 84  BE 00 00 00  0F B7 0E 3B
+77102A92  48 04 0F 83  90 05 00 00  8B F1 89 4D  08 8B CE 2B
+77102AA2  48 14 83 78  08 00 89 4D  FC 74 02 03  C9 8B D1 8B
+77102AB2  48 20 C1 E2  02 89 55 F8  03 D1 8B 0A  FF 48 0C 89
+
+Stack dump:
+0206FD20  002B0000 00300FF8 00000000 18000018  ..+.¯.0.........
+0206FD30  0206FE30 77145845 00000000 FFFFFFFE  0˛..EX.w....˛...
+0206FD40  7719F82E 002B0000 0206FE40 77102CEA  .¯.w..+.@˛..Í,.w
+0206FD50  002B0000 00301030 0206FE10 00000000  ..+.0.0..˛......
+0206FD60  7BCA275F 00000000 002B0000 00301000  _' {......+...0.
+0206FD70  00000038 00000000 00000024 00000001  8.......$.......
+0206FD80  00000000 00000000 00368D30 002B0150  ........0ç6.P.+.
+0206FD90  00000000 002B0000 002B0150 DC3CBA00  ......+.P.+..∫<‹
+0206FDA0  FFFFFFFF 002B0150 02000002 75F71F7C  ....P.+.....|.˜u
+0206FDB0  E20102E1 00000018 944BE884 FFFFFFFE  ·..‚....ÑËKî˛...
+0206FDC0  00000003 762B1194 00000018 00000027  ....î.+v....'...
+0206FDD0  77138EA4 ED08E702 00000018 770EFBB1  §é.w.Á.Ì....±˚.w
+0206FDE0  042BC7D8 00000038 00000000 0206FDF8  ÿ«+.8.......¯˝..
+0206FDF0  002B0178 00000000 002B0150 00000011  x.+.....P.+.....
+0206FE00  0206FEC4 00301038 00368D30 0206FE6C  ƒ˛..8.0.0ç6.l˛..
+0206FE10  00000007 00000000 0100FE30 00000000  ........0˛......
+0206FE20  000000C0 0101A000 0206FD60 0206F76C  ¿....†..`˝..l˜..
+0206FE30  0206FF0C 77145845 0EC3105F 00000000  ....EX.w_.√.....
+0206FE40  0206FE60 77102BD5 00300FF8 00301000  `˛..’+.w¯.0...0.
+0206FE50  00301008 00301000 00000009 00300FF8  ..0...0.....¯.0.
+0206FE60  0206FE88 77140D56 002B0000 00000000  à˛..V..w..+.....
+0206FE70  00301000 7EFDA000 002B4958 771D021C  ..0..†˝~XI+....w
+0206FE80  00000009 002B0000 0206FF1C 77126E16  ......+......n.w
+0206FE90  7BCA2603 00000000 00000000 6D020000  .& {...........m
+0206FEA0  00000024 00000001 002F9B30 00000000  $.......0õ/.....
+0206FEB0  00000060 FFD064CF FFFFFFFF 77140DDA  `...œd–.....⁄..w
+0206FEC0  77140E09 00000024 00000001 002F9B30  ...w$.......0õ/.
+0206FED0  00000000 00000060 FFD064CF FFFFFFFF  ....`...œd–.....
+0206FEE0  77126DC8 77126CEB 002B4958 003010F8  »m.wÎl.wXI+.¯.0.
+0206FEF0  771D021C 75F674E1 7EFDE000 7EFDA000  ...w·tˆu.‡˝~.†˝~
+0206FF00  00000000 0206FE90 0206F76C 0206FFC4  ....ê˛..l˜..ƒ...
+0206FF10  77145845 0EC367EF 00000000 0206FF2C  EX.wÔg√.....,...
+
+Stack walk:
+0206FD48  0206FE40 77102CEA 002B0000 00301030 0206FE10 00000000 
+          7BCA275F 00000000 002B0000 00301000 00000038 00000000 
+0206FE40  0206FE60 77102BD5 00300FF8 00301000 00301008 00301000 
+          00000009 00300FF8 0206FE88 77140D56 002B0000 00000000 
+0206FE60  0206FE88 77140D56 002B0000 00000000 00301000 7EFDA000 
+          002B4958 771D021C 00000009 002B0000 0206FF1C 77126E16 
+0206FE88  0206FF1C 77126E16 7BCA2603 00000000 00000000 6D020000 
+          00000024 00000001 002F9B30 00000000 00000060 FFD064CF 
+0206FF1C  0206FF2C 77126FD0 00000000 00000000 0206FF40 75F7198D 
+          00000000 00000000 00000000 0206FF50 762CD5A2 6D020000 
+0206FF2C  0206FF40 75F7198D 00000000 00000000 00000000 0206FF50 
+          762CD5A2 6D020000 00000000 0206FF88 6D0223C1 6D020000 
+0206FF40  0206FF50 762CD5A2 6D020000 00000000 0206FF88 6D0223C1 
+          6D020000 00000000 00000000 00000000 00000000 00000000 
+0206FF50  0206FF88 6D0223C1 6D020000 00000000 00000000 00000000 
+          00000000 00000000 00000000 00000000 00000000 00000000 
+0206FF88  0206FF94 762B338A 00000000 0206FFD4 77109902 00000000 
+          7BCA26CB 00000000 00000000 00000000 C0000005 762D773F 
+0206FF94  0206FFD4 77109902 00000000 7BCA26CB 00000000 00000000 
+          00000000 C0000005 762D773F 762D773F 0206FFA0 0206F76C 
+0206FFD4  0206FFEC 771098D5 6D022347 00000000 00000000 00000000 
+          00000000 00000000 6D022347 00000000 00000000 00000001 
+
+[Settings]
+Check DLL versions=0
+Topmost window=0
+Show main menu items that don't apply=0
+Show popup items that don't apply=0
+Show toolbar=1
+Use system colours in toolbar=0
+Status in toolbar=0
+Flash duration=1
+Autoupdate interval=4
+Mode of main window=0
+Restore windows=1045
+Bring OllyDbg to top on pause=1
+Restore window positions=1
+Restore width of columns=0
+Restore sorting criterium=1
+Highlight sorted column=1
+Right click selects=1
+Index of default font=1
+Index of default UNICODE font=3
+Index of default colours=0
+Code highlighting=0
+Horizontal scroll=0
+Snow-free drawing=1
+Append arguments=1
+Allow diacritical symbols=0
+Decode pascal strings=1
+Use IsTextUnicode=0
+String decoding=0
+File graph mode=1
+Dialog font mode=0
+Font in dialogs=0
+Align dialogs=1
+Global search=1
+Aligned search=0
+Ignore case=0
+Search direction=1
+Floating search with margin=0
+Allow extra commands in sequence=1
+Allow jumps into the sequence=0
+Keep size of hex edit selection=0
+List sorting mode=0
+Modify FPU tag=0
+MMX display mode=0
+Show tooltips in dialog windows=1
+X options coordinate=-1091
+Y options coordinate=520
+Last selected options pane=18
+Last edited font in options=0
+Last edited scheme in options=0
+Last edited colour index in options=9
+Last edited highlighting in options=1
+Last edited highlighting index in options=0
+Warnmode when not administrator=1
+Warnmode for packed code in Analyzer=0
+Warnmode when INT3 breakpoint is corrupt=0
+Warnmode when breakpoint set on non-command=0
+Warnmode when EIP set on non-command=0
+Warnmode when clipboard size too large=0
+Warnmode when all threads are suspended=0
+Warnmode when thread is changed=0
+Warnmode when process is still running=0
+Warnmode when active when closing OllyDbg=0
+Warnmode when unable to close process=0
+Warnmode when executable differs from udd=0
+Warnmode when INT3 in udd has different cmd=0
+Warnmode when fixups are modified=0
+Warnmode when memory breakpoint on stack=0
+Warnmode when modified debug registers=0
+Warnmode when launching loaddll=0
+Only ASCII printable in dump=0
+Code page for ASCII dumps=1251
+Underline fixups=1
+Show jump direction=1
+Show jump path=1
+Show grayed path if jump is not taken=1
+Fill rest of command with NOPs=1
+Action on letter key in Disassembler=1
+Wide characters in UNICODE dumps=1
+Automatically backup user code=0
+Visible lines when scrolling disasm=1
+IDEAL disassembling mode=0
+Disassemble in lowercase=0
+Separate arguments with TAB=0
+Extra space between arguments=0
+Show default segments=1
+Always show memory size=1
+NEAR jump modifiers=0
+Use short form of string commands=0
+Use RET instead of RETN=0
+SSE size decoding mode=0
+Jump hint decoding mode=0
+Size sensitive mnemonics=1
+Top of FPU stack=1
+Show symbolic addresses=1
+Show local module names=0
+Demangle symbolic names=0
+Use hardware breakpoints for stepping=0
+First pause=3
+Pause on attach=1
+Pause on Loaddll=1
+Assume flat selectors=0
+Ignore access violations in KERNEL32=1
+Ignore INT3=0
+Ignore TRAP=0
+Ignore access violations=0
+Ignore division by 0=0
+Ignore illegal instructions=0
+Ignore all FPU exceptions=0
+Ignore custom exception ranges=0
+Call UnhandledExceptionFilter=0
+Report ignored exceptions to log=1
+Autoreturn=0
+Use DebugBreakProcess=0
+Use ExitProcess=1
+Warn when frequent breaks=1
+Allow command emulation=1
+Debug child processes=0
+Animation delay index=0
+Stop on new DLL=0
+Stop on DLL unload=0
+Stop only on selected modules=0
+Stop on debug string=0
+Stop on new thread=0
+Stop on thread end=0
+Enable use of debugging data=1
+Use dbghelp to walk stack=0
+Use Microsoft Symbol Server=0
+Hide missing source files=1
+Hide internal compiler names=1
+Skip leading spaces from source=1
+Hide Call DLL window on call=0
+Pause after call to DLL is finished=1
+Allow .NET debugging=0
+Run trace protocolling options=0
+Run trace buffer size index=2
+Trace over system DLLs=1
+Trace over string commands=1
+Save traced commands=0
+Save accessed memory to trace=0
+Save FPU registers to trace=0
+Synchronize CPU and Run trace=1
+Set breakpoints on callbacks in hit trace=0
+Hit trace mode for indirect jumps=0
+Stop hit trace if not command=0
+Hit trace outside the code section=2
+Show symbolic names in protocol range list=0
+Use predictions in search=1
+References include indirect jumps=1
+Add origin to search results=0
+Default resource language=9
+Gray inactive windows=1
+Gray register names=0
+Center FOLLOWed command=1
+Decode registers for any IP=0
+Remove code hilite on register hilite=1
+Automatically select register type=0
+Enable SSE registers=1
+Label display mode=0
+Highlight symbolic labels=0
+Log buffer size index=2
+Tabulate columns in log file=0
+Append data to existing log file=0
+Auto analysis=1
+No predicted registers in system DLLs=0
+Fuzzy analysis=1
+Report problems during analysis=0
+Decode tricks=1
+Mark tricks=0
+Decode ifs as switches=0
+Mark only important operands=0
+Functions preserve registers=1
+Ignore braces in udd path=1
+Guess number of arguments=1
+Guess arguments from mangled names=0
+Guess meaning of guessed arguments=1
+Show uncertain arguments=1
+Rename value dependent arguments=0
+Show predicted values=1
+Show ARG and LOCAL in disassembly=1
+Use symbolic names for ARG and LOCAL=0
+Show ARG and LOCAL in comments=1
+Show loops=1
+Accept far calls and returns=0
+Accept direct segment modifications=0
+Accept privileged commands=0
+Accept I/O commands=0
+Accept NOPs=1
+Accept shifts out of range=0
+Accept superfluous prefixes=0
+Accept default prefixes=1
+Accept valid LOCK prefixes=1
+Accept unaligned stack operations=1
+Accept suspicious ESP operations=0
+Accept non-standard command forms=1
+Accept access to nonexisting memory=0
+Accept interrupt commands=0
+Block external WM_CLOSE=1
+Activate speech=0
+Translate commands and registers=1
+Skip leading zeros in hex numbers=1
+
+--------------------------------------------------------------
+

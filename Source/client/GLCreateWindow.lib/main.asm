@@ -22,7 +22,7 @@ segment .data use32 align=1
     .destroy: db 'DestroyWindow',0
 
   wnd_size equ dword WNDCLASSEX.wndsize
-
+  
 segment .bss use32 align=1
 WNDCLASSEX:
 	.cbSize resd 1
@@ -44,7 +44,17 @@ MSG:
   .lParam resd 1
   .time resd 1
   .pt resd 1
+  
+SCREEN_SIZE:
+  .width resd 1
+  .height resd 1
 
+WNDPOS:
+  .x resd 1
+  .y resd 1
+  .width resd 1
+  .height resd 1
+  
 segment .text use32 align=1
 DLLMain: ; params: histance/reason/reserved
   cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
@@ -118,23 +128,23 @@ GLMainLoop:
     jmp GLMainLoop_exit
 
 GetScreenWH:
-  mov ebx, 1; error
+  xor eax, eax
   push 17 ; SM_CXFULLSCREEN
   call [GetSystemMetrics]
   test eax, eax
   jz next_exit
-  mov ecx, eax
+  mov [SCREEN_SIZE.width], eax
+  xor eax, eax
   push 16 ; SM_CYFULLSCREEN
   call [GetSystemMetrics]
   test eax, eax
   jz next_exit
- 
-  xor ebx, ebx ; success
+  mov [SCREEN_SIZE.height], eax
   next_exit:
-  xchg eax, ebx
+  mov eax, SCREEN_SIZE
   ret
 
-GLCreateWindow: ; one param - lpfnWndProc
+GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
   push ebp
   mov ebp, esp
   call InitWndClass
@@ -146,10 +156,13 @@ GLCreateWindow: ; one param - lpfnWndProc
   push dword [WNDCLASSEX.hInstance]
   push 0 ; menu
   push 0 ; parent
-  push 768 ; height
-  push 1024 ; width
-  push 10 ; y
-  push 10 ; x
+  mov eax, [esp+8]
+
+  push dword WNDPOS.height ; height
+  push dword WNDPOS.width ; width
+  ;push dword [WNDPOS.y] ; y
+  push dword eax
+  push dword 1 ; x
   mov eax, 0x00000000 ; overload
   or eax, 0x00080000 ; SYSMENU
   push eax ; style
@@ -166,7 +179,7 @@ GLCreateWindow: ; one param - lpfnWndProc
 
   exit:
     leave
-    retn 4
+    retn 8
 
   error:
     .dest:

@@ -1,8 +1,15 @@
+#pragma pack(push, 1)
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <windows.h>
 
 char DLL[1024]{};
+
+struct SCREENSIZE
+{
+  LONG width;
+  LONG height;
+};
 
 LRESULT CALLBACK WindowProc(
   _In_ HWND   hwnd,
@@ -48,25 +55,23 @@ int main(int argc, char** argv) {
   if (att != INVALID_FILE_ATTRIBUTES) {
     HMODULE h = LoadLibraryA(DLL);
     if (h) {
-      HWND(_stdcall*call)(WNDPROC);
-      call = (HWND(_stdcall*)(WNDPROC))GetProcAddress(h, argv[2]);
+      SCREENSIZE*(_fastcall *GetWH)();
+      GetWH = (SCREENSIZE*(_fastcall*)())GetProcAddress(h, "GetScreenWH");
+      unsigned int X = 0, Y = 0;
+      SCREENSIZE *ret = GetWH();
+      X = ret->width;
+      Y = ret->height;
+
+      std::cout << "GetScreenWH returned: " << (int)ret << std::endl;
+      std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
+
+      HWND(_stdcall*call)(WNDPROC, RECT* pos);
+      call = (HWND(_stdcall*)(WNDPROC,RECT*))GetProcAddress(h, argv[2]);
       if (call) {
-        HWND hwnd = call(WindowProc);
+        RECT pos{ 10, 50, 1024, 768 };
+        HWND hwnd = call(WindowProc, &pos);
         if (hwnd) {
           ShowWindow(hwnd, SW_SHOW);
-
-          bool(_fastcall *GetWH)();
-          GetWH = (bool(_fastcall*)())GetProcAddress(h, "GetScreenWH");
-          unsigned int X = 0, Y = 0;
-          bool ret = GetWH();
-          _asm {
-            mov X, ebx
-            mov Y, ecx
-          }
-
-          std::cout << "GetScreenWH returned: " << ret << std::endl;
-          std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
-
           void(_stdcall*GLMainLoop)();
           GLMainLoop = (void(_stdcall*)())GetProcAddress(h, "GLMainLoop");
           if (GLMainLoop)
@@ -86,3 +91,5 @@ int main(int argc, char** argv) {
   else
     std::cout << "dll not found\n";
 }
+
+#pragma pack(pop, 1)
