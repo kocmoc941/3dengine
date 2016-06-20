@@ -147,6 +147,15 @@ GetScreenWH:
 GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
   push ebp
   mov ebp, esp
+  mov eax, [esp+4]
+  mov eax, [eax]
+  mov [WNDPOS.height], eax
+  mov eax, [eax+4]
+  mov [WNDPOS.width], eax
+  mov eax, [eax+8]
+  mov [WNDPOS.y], eax
+  mov eax, [eax+12]
+  mov [WNDPOS.x], eax
   call InitWndClass
   push WNDCLASSEX
   call [RegisterClassExA]
@@ -156,13 +165,10 @@ GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
   push dword [WNDCLASSEX.hInstance]
   push 0 ; menu
   push 0 ; parent
-  mov eax, [esp+8]
-
-  push dword WNDPOS.height ; height
-  push dword WNDPOS.width ; width
-  ;push dword [WNDPOS.y] ; y
-  push dword eax
-  push dword 1 ; x
+  push dword [WNDPOS.height] ; height
+  push dword [WNDPOS.width] ; width
+  push dword [WNDPOS.y] ; y
+  push dword [WNDPOS.x] ; x
   mov eax, 0x00000000 ; overload
   or eax, 0x00080000 ; SYSMENU
   push eax ; style
