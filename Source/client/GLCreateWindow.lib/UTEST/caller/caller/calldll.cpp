@@ -65,11 +65,11 @@ int main(int argc, char** argv) {
       std::cout << "GetScreenWH returned: " << (int)ret << std::endl;
       std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
 
-      HWND(_stdcall*call)(WNDPROC, RECT* pos);
-      call = (HWND(_stdcall*)(WNDPROC,RECT*))GetProcAddress(h, argv[2]);
+      HWND(_stdcall*call)(WNDPROC, RECT* pos, const char*);
+      call = (HWND(_stdcall*)(WNDPROC, RECT*, const char*))GetProcAddress(h, argv[2]);
       if (call) {
-        RECT pos{ 10, 50, 1024, 768 };
-        HWND hwnd = call(WindowProc, &pos);
+        RECT pos{ 100, 50, 1024, 768 };
+        HWND hwnd = call(WindowProc, &pos, "3D engine test");
         if (hwnd) {
           ShowWindow(hwnd, SW_SHOW);
           void(_stdcall*GLMainLoop)();

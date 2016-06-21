@@ -66,13 +66,13 @@ DLLMain: ; params: histance/reason/reserved
     sete al
     retn 12
 
-InitWndClass:
+GLCreateWindow_InitWndClass: ; no params
   mov eax, wnd_size
   wndeax(cbSize)
   mov eax, 0x0002 ;CS_HREDRAW
   or eax, 0x0001  ;CS_VREDRAW
   wndeax(cbStyle)
-  mov eax, [esp+12] ; lpfnWndProc
+  mov eax, [ebp+8] ; lpfnWndProc
   wndeax(lpfnWndProc)
   xor eax, eax
   wndeax(cbClsExtra)
@@ -87,7 +87,7 @@ InitWndClass:
   wndeax(hIconSm)
   retn
 
-UnloadClass:
+UnloadClass: ; no params
   push cl_name
   push WNDCLASSEX.hInstance
   call [UnregisterClassA]
@@ -102,7 +102,7 @@ UnloadClass:
   mov esp, eax
   retn
 
-GLMainLoop:
+GLMainLoop: ; no params
   push 0
   push 0
   push 0
@@ -127,7 +127,7 @@ GLMainLoop:
     jz error.dest
     jmp GLMainLoop_exit
 
-GetScreenWH:
+GetScreenWH: ; no params
   xor eax, eax
   push 17 ; SM_CXFULLSCREEN
   call [GetSystemMetrics]
@@ -144,23 +144,26 @@ GetScreenWH:
   mov eax, SCREEN_SIZE
   ret
 
-GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
+GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}, wndname
   push ebp
   mov ebp, esp
-  mov eax, [esp+4]
-  mov eax, [eax]
-  mov [WNDPOS.height], eax
-  mov eax, [eax+4]
-  mov [WNDPOS.width], eax
-  mov eax, [eax+8]
-  mov [WNDPOS.y], eax
-  mov eax, [eax+12]
+  mov ebx, [ebp+12]; pos in RECT
+  mov eax, [ebx+0]
   mov [WNDPOS.x], eax
-  call InitWndClass
+  mov eax, [ebx+4]
+  mov [WNDPOS.y], eax
+  mov eax, [ebx+8]
+  mov [WNDPOS.width], eax
+  mov eax, [ebx+12]
+  mov [WNDPOS.height], eax
+
+  call GLCreateWindow_InitWndClass
+
   push WNDCLASSEX
   call [RegisterClassExA]
   test eax,eax
   jz error.unreg
+
   push 0 ; lpparam
   push dword [WNDCLASSEX.hInstance]
   push 0 ; menu
@@ -172,7 +175,7 @@ GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
   mov eax, 0x00000000 ; overload
   or eax, 0x00080000 ; SYSMENU
   push eax ; style
-  push wn_name
+  push dword [ebp+16]
   push cl_name
   mov eax, 0200h ; clientedge
   or eax, 0100h ; windowdedge
@@ -185,7 +188,7 @@ GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}
 
   exit:
     leave
-    retn 8
+    retn 12
 
   error:
     .dest:
