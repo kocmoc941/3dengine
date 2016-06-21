@@ -35,6 +35,35 @@ WNDCLASSEX:
 	.lpszClassName resd 1
 	.hIconSm resd 1
   .wndsize equ $-WNDCLASSEX
+  
+PIXELFORMAT:
+  .nSize: resw 1
+  .nVersion: resw 1
+  .dwFlags: resd 1
+  .iPixelType: resb 1
+  .cColorBits: resb 1
+  .cRedBits: resb 1
+  .cRedShift: resb 1
+  .cGreenBits: resb 1
+  .cGreenShift: resb 1
+  .cBlueBits: resb 1
+  .cBlueShift: resb 1
+  .cAlphaBits: resb 1
+  .cAlphaShift: resb 1
+  .cAccumBits: resb 1
+  .cAccumRedBits: resb 1
+  .cAccumGreenBits: resb 1
+  .cAccumBlueBits: resb 1
+  .cAccumAlphaBits: resb 1
+  .cDepthBits: resb 1
+  .cStencilBits: resb 1
+  .cAuxBuffers: resb 1
+  .iLayerType: resb 1
+  .bReserved: resb 1
+  .dwLayerMask: resd 1
+  .dwVisibleMask: resd 1
+  .dwDamageMask: resd 1
+  .pxsize: equ $-PIXELFORMAT
 
 MSG:
   .hwnd resd 1
@@ -66,8 +95,21 @@ DLLMain: ; params: histance/reason/reserved
     sete al
     retn 12
 
+InitPIXELFORMAT: ; params: no
+                 ; return: no
+  mov eax, PIXELFORMAT.pxsize
+  mov ecx, 4
+  div dword ecx
+  mov ecx, eax
+  ;repe mov [PIXELFORMAT+ecx], dword 0
+  cld
+  mov dword [es:edi], PIXELFORMAT
+  repne stosb
+  retn
+
 GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
                              ; return: 0
+call InitPIXELFORMAT
   mov eax, wnd_size
   wndeax(cbSize)
   mov eax, 0x0002 ; CS_HREDRAW
