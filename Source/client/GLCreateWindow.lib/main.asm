@@ -59,7 +59,7 @@ DLLMain: ; params: histance/reason/reserved
          ; return: 1
   cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
   jne dllexit
-    mov eax, [esp+8]
+    mov eax, [esp+4]
     mov [WNDCLASSEX.hInstance], eax
   dllexit:
     xor eax, eax
@@ -126,8 +126,21 @@ GLMainLoop: ; params: no
     call [DestroyWindow]
     test eax, eax
     jz error.dest
-    ;call UnloadClass
+    
+    push cl_name
+    push WNDCLASSEX.hInstance
+    call [UnregisterClassA]    
+    test eax, eax
+    jz error.destroy
     jmp GLMainLoop_exit
+
+    error.destroy:
+      push 0
+      push 0
+      push msgerr.destroy
+      push 0
+      call [MessageBoxA]
+      jmp GLMainLoop_exit
 
 GetScreenWH: ; params: no
              ; return: ptr struct {LONG width,LONG height}
@@ -147,7 +160,7 @@ GetScreenWH: ; params: no
   mov eax, SCREEN_SIZE
   retn
 
-GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y,LONG width,LONG height}, wndname
+GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y,LONG width,LONG height}, ptr wndname
                 ; return: handle window {HWND}
   push ebp
   mov ebp, esp

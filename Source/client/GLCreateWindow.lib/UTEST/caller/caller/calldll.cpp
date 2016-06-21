@@ -61,13 +61,13 @@ int main(int argc, char** argv) {
       X = ret->width;
       Y = ret->height;
 
-      std::cout << "GetScreenWH returned: " << (int)ret << std::endl;
+      std::cout << "GetScreenWH returned " << std::endl;
       std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
 
       HWND(_stdcall*call)(WNDPROC, RECT* pos, const char*);
       call = (HWND(_stdcall*)(WNDPROC, RECT*, const char*))GetProcAddress(h, argv[2]);
       if (call) {
-        RECT pos{ X/2-1024/4, Y/2-768/2, 1024, 768 };
+        RECT pos{ (LONG)X/2-1024/4, (LONG)Y/2-768/2, 1024, 768 };
         HWND hwnd = call(WindowProc, &pos, "3D engine test");
         if (hwnd) {
           ShowWindow(hwnd, SW_SHOW);
@@ -77,15 +77,16 @@ int main(int argc, char** argv) {
             GLMainLoop();
           else
             std::cout << "GLMainLoop not found\n";
+          std::cout << "GetLastError return: " << GetLastError() << std::endl;
         }
-        std::cout << argv[2] << " returned: " << hwnd;
+        std::cout << argv[2] << " returned: " << hwnd << std::endl;
       }
       else
         std::cout << argv[2] << " not found\n";
       FreeLibrary(h);
     }
     else
-      std::cout << "wrong structure dll\n";
+      std::cout << "wrong load dll\n";
   }
   else
     std::cout << "dll not found\n";
