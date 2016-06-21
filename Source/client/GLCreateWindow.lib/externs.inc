@@ -1,14 +1,9 @@
-EXTERN ExitProcess
 EXTERN CreateWindowExA
 EXTERN RegisterClassExA
 EXTERN TranslateMessage
 EXTERN DispatchMessageA
 EXTERN MessageBoxA
 EXTERN UnregisterClassA
-EXTERN GetLastError
-EXTERN GetModuleHandleA
 EXTERN GetMessageA
-EXTERN TranslateMessage
-EXTERN DispatchMessageA
 EXTERN DestroyWindow
 EXTERN GetSystemMetrics
