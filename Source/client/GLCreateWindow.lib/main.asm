@@ -14,7 +14,6 @@ EXPORT GetScreenWH
 segment .data use32 align=1
   hwnd: dd 0
   cl_name db '__unique_class_name_cogl_creator__',0
-  wn_name db '3D Engine',0
   msgerr:
     .register: db 'RegisterClassExA',0
     .window: db 'CreateWindowExA',0
@@ -57,6 +56,7 @@ WNDPOS:
   
 segment .text use32 align=1
 DLLMain: ; params: histance/reason/reserved
+         ; return: 1
   cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
   jne dllexit
     mov eax, [esp+8]
@@ -66,13 +66,14 @@ DLLMain: ; params: histance/reason/reserved
     sete al
     retn 12
 
-GLCreateWindow_InitWndClass: ; no params
+GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
+                             ; return: 0
   mov eax, wnd_size
   wndeax(cbSize)
-  mov eax, 0x0002 ;CS_HREDRAW
-  or eax, 0x0001  ;CS_VREDRAW
+  mov eax, 0x0002 ; CS_HREDRAW
+  or eax, 0x0001  ; CS_VREDRAW
   wndeax(cbStyle)
-  mov eax, [ebp+8] ; lpfnWndProc
+  mov eax, [ebp+8] ; ptr lpfnWndProc
   wndeax(lpfnWndProc)
   xor eax, eax
   wndeax(cbClsExtra)
@@ -87,7 +88,8 @@ GLCreateWindow_InitWndClass: ; no params
   wndeax(hIconSm)
   retn
 
-UnloadClass: ; no params
+UnloadClass: ; params: no
+             ; return: no
   push cl_name
   push WNDCLASSEX.hInstance
   call [UnregisterClassA]
@@ -97,12 +99,11 @@ UnloadClass: ; no params
   push 0
   test eax, eax
   jz error.msgbox
-  mov eax, esp
-  add eax, 16
-  mov esp, eax
+  add esp, 16
   retn
 
-GLMainLoop: ; no params
+GLMainLoop: ; params: no
+            ; return: no
   push 0
   push 0
   push 0
@@ -125,9 +126,11 @@ GLMainLoop: ; no params
     call [DestroyWindow]
     test eax, eax
     jz error.dest
+    ;call UnloadClass
     jmp GLMainLoop_exit
 
-GetScreenWH: ; no params
+GetScreenWH: ; params: no
+             ; return: ptr struct {LONG width,LONG height}
   xor eax, eax
   push 17 ; SM_CXFULLSCREEN
   call [GetSystemMetrics]
@@ -142,12 +145,13 @@ GetScreenWH: ; no params
   mov [SCREEN_SIZE.height], eax
   next_exit:
   mov eax, SCREEN_SIZE
-  ret
+  retn
 
-GLCreateWindow: ; params - lpfnWndProc, RECT{pos_x,pos_y,width,height}, wndname
+GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y,LONG width,LONG height}, wndname
+                ; return: handle window {HWND}
   push ebp
   mov ebp, esp
-  mov ebx, [ebp+12]; pos in RECT
+  mov ebx, [ebp+12] ; pos in RECT
   mov eax, [ebx+0]
   mov [WNDPOS.x], eax
   mov eax, [ebx+4]

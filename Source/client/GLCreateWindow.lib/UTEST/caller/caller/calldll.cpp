@@ -1,4 +1,3 @@
-#pragma pack(push, 1)
 #define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <windows.h>
@@ -68,7 +67,7 @@ int main(int argc, char** argv) {
       HWND(_stdcall*call)(WNDPROC, RECT* pos, const char*);
       call = (HWND(_stdcall*)(WNDPROC, RECT*, const char*))GetProcAddress(h, argv[2]);
       if (call) {
-        RECT pos{ 100, 50, 1024, 768 };
+        RECT pos{ X/2-1024/4, Y/2-768/2, 1024, 768 };
         HWND hwnd = call(WindowProc, &pos, "3D engine test");
         if (hwnd) {
           ShowWindow(hwnd, SW_SHOW);
@@ -91,5 +90,3 @@ int main(int argc, char** argv) {
   else
     std::cout << "dll not found\n";
 }
-
-#pragma pack(pop, 1)
