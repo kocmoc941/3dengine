@@ -4,25 +4,33 @@
 ; calling convention is stdcall
 
 %INCLUDE "externs.inc"
+%INCLUDE "consts.inc"
 
 GLOBAL DLLMain
 EXPORT GLCreateWindow
 EXPORT GLMainLoop
 EXPORT GetScreenWH
+EXPORT GLChangeResolution
 
 %define wndeax(arg) mov [WNDCLASSEX.%+arg], eax
+%define pxeax(arg) mov [PIXELFORMAT.%+arg], eax
 
 segment .data use32 align=1
   hwnd: dd 0
+  hdc: dd 0
   cl_name db '__unique_class_name_cogl_creator__',0
   msgerr:
     .register: db 'RegisterClassExA',0
     .window: db 'CreateWindowExA',0
     .unregister: db 'UnregisterClassA',0
     .destroy: db 'DestroyWindow',0
+    .hdc: db 'GetDC',0
+    .ChoosePixelFormat db 'ChoosePixelFormat',0
+    .SetPixelFormat db 'SetPixelFormat',0
 
-  wnd_size equ dword WNDCLASSEX.wndsize
-  
+  wnd_size: equ dword WNDCLASSEX.wndsize
+  px_size: equ dword PIXELFORMAT.pxsize
+
 segment .bss use32 align=1
 WNDCLASSEX:
 	.cbSize resd 1
@@ -96,9 +104,10 @@ DLLMain: ; params: histance/reason/reserved
     sete al
     retn 12
 
-InitPIXELFORMAT: ; params: no
+ChangePixelFormat: ; params: no
                  ; return: no
-  mov eax, PIXELFORMAT.pxsize
+  ; clear
+  mov eax, px_size
   mov ecx, 2
   div dword ecx
   mov ecx, eax
@@ -109,14 +118,54 @@ InitPIXELFORMAT: ; params: no
   cld
   xor eax, eax
   mov edi, PIXELFORMAT
-  repnz stosw
+  repne stosw
   popf
   
+  ; init for ChoosePixelFormat
+  mov eax, px_size
+  pxeax(nSize)
+  mov eax, 1
+  pxeax(nVersion)
+  mov eax, PFD_SUPPORT_OPENGL
+  or eax, PFD_NEED_PALETTE ; Colors in the palette should be specified according to the values of the cRedBits, cRedShift, cGreenBits, cGreenShift, cBluebits, and cBlueShift members
+  or eax, PFD_DOUBLEBUFFER
+  or eax, PFD_DRAW_TO_WINDOW
+  pxeax(dwFlags)
+  mov eax, PFD_TYPE_RGBA
+  pxeax(iPixelType)
+  mov eax, 32
+  pxeax(cColorBits)
+  pxeax(cAlphaBits)
+  ;cAccumBits
+  pxeax(cDepthBits)
+  ;pxeax(cStencilBits)
+  ;pxeax(cAuxBuffers)
+  mov eax, PFD_MAIN_PLANE
+  pxeax(iLayerType)
+  
+  push PIXELFORMAT
+  push dword [hwnd]
+  call [GetDC]
+  test eax, eax
+  jz error.dc
+  mov [hdc], eax
+  push eax
+  call [ChoosePixelFormat]
+  test eax, eax
+  jz error.ChoosePixelFormat
+  
+  push PIXELFORMAT
+  push eax ; format from ChoosePixelFormat
+  push dword [hdc]
+  call dword [SetPixelFormat]
+  test eax, eax
+  jz error.SetPixelFormat
+
   retn
 
 GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
                              ; return: 0
-call InitPIXELFORMAT
+  call ChangePixelFormat
   mov eax, wnd_size
   wndeax(cbSize)
   mov eax, 0x0002 ; CS_HREDRAW
@@ -127,7 +176,7 @@ call InitPIXELFORMAT
   xor eax, eax
   wndeax(cbClsExtra)
   wndeax(cbWndExtra)
-;  wndeax(hInstance) ; receive from in DLLMain
+  ;wndeax(hInstance) ; receive from in DLLMain
   wndeax(hIcCurBr)
   wndeax(lpszMenuName)
   wndeax(lpszMenuName)
@@ -149,6 +198,11 @@ UnloadClass: ; params: no
   test eax, eax
   jz error.msgbox
   add esp, 16
+  retn
+
+GLChangeResolution: ; params: width{long}/height{long}
+                    ; return: no
+; //TODO: make struc DEVMODE for ChangeDisplaySettings
   retn
 
 GLMainLoop: ; params: no
@@ -257,6 +311,24 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
     retn 12
 
   error:
+    .SetPixelFormat:
+      push 0
+      push 0
+      push msgerr.SetPixelFormat
+      push 0
+      jmp .msgbox    
+    .ChoosePixelFormat:
+      push 0
+      push 0
+      push msgerr.ChoosePixelFormat
+      push 0
+      jmp .msgbox    
+    .dc:
+      push 0
+      push 0
+      push msgerr.hdc
+      push 0
+      jmp .msgbox    
     .dest:
       push 0
       push 0

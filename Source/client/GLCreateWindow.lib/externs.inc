@@ -7,3 +7,8 @@ EXTERN UnregisterClassA
 EXTERN GetMessageA
 EXTERN DestroyWindow
 EXTERN GetSystemMetrics
+EXTERN ChoosePixelFormat ;Gdi32
+EXTERN SetPixelFormat ;Gdi32
+EXTERN ChangeDisplaySettingsA ;user32
+EXTERN EnumDisplaySettingsA ;user32
+EXTERN GetDC
