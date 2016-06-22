@@ -1,3 +1,4 @@
+;%define __DEBUG__
 
 ; graphical module for opengl rendering
 ; calling convention is stdcall
@@ -98,13 +99,19 @@ DLLMain: ; params: histance/reason/reserved
 InitPIXELFORMAT: ; params: no
                  ; return: no
   mov eax, PIXELFORMAT.pxsize
-  mov ecx, 4
+  mov ecx, 2
   div dword ecx
   mov ecx, eax
-  ;repe mov [PIXELFORMAT+ecx], dword 0
+  %ifdef __DEBUG__
+  int3
+  %endif
+  pushf
   cld
-  mov dword [es:edi], PIXELFORMAT
-  repne stosb
+  xor eax, eax
+  mov edi, PIXELFORMAT
+  repnz stosw
+  popf
+  
   retn
 
 GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
