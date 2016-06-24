@@ -18,7 +18,7 @@ EXPORT GLChangeResolution
 segment .data use32 align=1
   hwnd: dd 0
   hdc: dd 0
-  curr_disp_res: dq 0
+  curr_disp_res: dq 0 ; width+height
   cl_name db '__unique_class_name_cogl_creator__',0
   msgerr:
     .register: db 'RegisterClassExA',0
@@ -230,8 +230,8 @@ GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
 
 UnloadClass: ; params: no
              ; return: no
-  push cl_name
   push WNDCLASSEX.hInstance
+  push cl_name
   call [UnregisterClassA]
   push 0
   push 0
@@ -328,23 +328,23 @@ GLMainLoop: ; params: no
     push CDS_UPDATEREGISTRY
     push DEVMODE
     call [ChangeDisplaySettingsA]
-    
+    ; destroy window
     push dword [hwnd]
     call [DestroyWindow]
     test eax, eax
     jz error.dest
-    
-    push cl_name
+
     push WNDCLASSEX.hInstance
+    push cl_name
     call [UnregisterClassA]    
     test eax, eax
-    jz error.destroy
+    jz error.UnregisterClass
     jmp GLMainLoop_exit
 
-    error.destroy:
+    error.UnregisterClass:
       push 0
       push 0
-      push msgerr.destroy
+      push msgerr.unregister
       push 0
       call [MessageBoxA]
       jmp GLMainLoop_exit
