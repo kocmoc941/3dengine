@@ -25,8 +25,11 @@ segment .data use32 align=1
     .unregister: db 'UnregisterClassA',0
     .destroy: db 'DestroyWindow',0
     .hdc: db 'GetDC',0
-    .ChoosePixelFormat db 'ChoosePixelFormat',0
-    .SetPixelFormat db 'SetPixelFormat',0
+    .ChoosePixelFormat: db 'ChoosePixelFormat',0
+    .SetPixelFormat: db 'SetPixelFormat',0
+    .EnumDisplaySettings: db 'EnumDisplaySettings',0
+    .ChangeDisplaySettings:    db "ChangeDisplaySettings",0
+    .cds_test: db 'CDS_TEST not pass',0
 
   wnd_size: equ dword WNDCLASSEX.wndsize
   px_size: equ dword PIXELFORMAT.pxsize
@@ -92,6 +95,44 @@ WNDPOS:
   .width resd 1
   .height resd 1
   
+DEVMODE:
+  .dmDeviceName: resb 32
+  .dmSpecVersion: resw 1
+  .dmDriverVersion: resw 1
+  .dmSize: resw 1
+  .dmDriverExtra: resw 1
+  .dmFields: resd 1
+  .dmOrientation: resw 1
+  .dmPaperSize: resw 1
+  .dmPaperLength: resw 1
+  .dmPaperWidth: resw 1
+  .dmScale: resw 1
+  .dmCopies: resw 1
+  .dmDefaultSource: resw 1
+  .dmPrintQuality: resw 1
+  .dmColor: resw 1
+  .dmDuplex: resw 1
+  .dmYResolution: resw 1
+  .dmTTOption: resw 1
+  .dmCollate: resw 1
+  .dmFormName: resb 32
+  .dmLogPixels: resw 1
+  .dmBitsPerPel: resd 1
+  .dmPelsWidth: resd 1
+  .dmPelsHeight: resd 1
+  .dmDisplayFlags: resd 1
+  .dmDisplayFrequency: resd 1
+  ; только для Windows 95, 98, 2000
+  ;.dmICMMethod As Long
+  ;.dmICMIntent As Long
+  ;.dmMediaType As Long
+  ;.dmDitherType As Long
+  ;.dmReserved1 As Long
+  ;.dmReserved2 As Long
+  ; только для Windows 2000
+  ;.dmPanningWidth As Long
+  ;.dmPanningHeight As Long
+
 segment .text use32 align=1
 DLLMain: ; params: histance/reason/reserved
          ; return: 1
@@ -202,8 +243,27 @@ UnloadClass: ; params: no
 
 GLChangeResolution: ; params: width{long}/height{long}
                     ; return: no
-; //TODO: make struc DEVMODE for ChangeDisplaySettings
-  retn
+  push DEVMODE
+  push ENUM_CURRENT_SETTINGS
+  push 0
+  call [EnumDisplaySettingsA]
+  test eax, eax
+  jz error.EnumDisplaySettings
+  mov eax, [esp+4]
+  mov dword [DEVMODE.dmPelsWidth], eax
+  mov eax, [esp+8]
+  mov dword [DEVMODE.dmPelsHeight], eax
+  push CDS_TEST
+  push DEVMODE
+  call [ChangeDisplaySettingsA]
+  test eax, eax ; DISP_CHANGE_SUCCESSFUL = 0
+  jnz error.cds_test
+  push CDS_UPDATEREGISTRY
+  push DEVMODE
+  call [ChangeDisplaySettingsA]
+  test eax, eax ; DISP_CHANGE_SUCCESSFUL = 0
+  jnz error.ChangeDisplaySettings
+  retn 8
 
 GLMainLoop: ; params: no
             ; return: no
@@ -305,12 +365,30 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   jz error.wnd
 
   mov [hwnd], eax
-
+  call GLChangeResolution
   exit:
     leave
     retn 12
 
   error:
+    .cds_test
+      push 0
+      push 0
+      push msgerr.cds_test
+      push 0
+      jmp .msgbox    
+    .ChangeDisplaySettings:
+      push 0
+      push 0
+      push msgerr.ChangeDisplaySettings
+      push 0
+      jmp .msgbox    
+    .EnumDisplaySettings:
+      push 0
+      push 0
+      push msgerr.EnumDisplaySettings
+      push 0
+      jmp .msgbox    
     .SetPixelFormat:
       push 0
       push 0

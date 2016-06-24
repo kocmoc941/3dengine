@@ -64,6 +64,10 @@ int main(int argc, char** argv) {
       std::cout << "GetScreenWH returned " << std::endl;
       std::cout << "screen X size: " << X << "\nscreen Y size: " << Y << std::endl;
 
+      void(_stdcall*GLChangeResolution)(LONG width, LONG height);
+      GLChangeResolution = (void(_stdcall*)(LONG, LONG))GetProcAddress(h, "GLChangeResolution");
+      if (GLChangeResolution)
+        GLChangeResolution(1024,768);
       HWND(_stdcall*call)(WNDPROC, RECT* pos, const char*);
       call = (HWND(_stdcall*)(WNDPROC, RECT*, const char*))GetProcAddress(h, argv[2]);
       if (call) {
