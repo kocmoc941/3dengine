@@ -18,6 +18,7 @@ EXPORT GLChangeResolution
 segment .data use32 align=1
   hwnd: dd 0
   hdc: dd 0
+  curr_disp_res: dq 0
   cl_name db '__unique_class_name_cogl_creator__',0
   msgerr:
     .register: db 'RegisterClassExA',0
@@ -249,6 +250,13 @@ GLChangeResolution: ; params: width{long}/height{long}
   call [EnumDisplaySettingsA]
   test eax, eax
   jz error.EnumDisplaySettings
+  
+  ;save current settings
+  mov edx, dword [DEVMODE.dmPelsWidth]
+  mov dword [curr_disp_res], edx
+  mov edx, dword [DEVMODE.dmPelsHeight]
+  mov dword [curr_disp_res+4], edx
+  
   mov eax, [esp+4]
   mov dword [DEVMODE.dmPelsWidth], eax
   mov eax, [esp+8]
@@ -263,7 +271,30 @@ GLChangeResolution: ; params: width{long}/height{long}
   call [ChangeDisplaySettingsA]
   test eax, eax ; DISP_CHANGE_SUCCESSFUL = 0
   jnz error.ChangeDisplaySettings
+  chng.exit:
   retn 8
+
+  error.cds_test:
+    push 0
+    push 0
+    push msgerr.cds_test
+    push 0
+    call [MessageBoxA]
+    jmp chng.exit
+  error.ChangeDisplaySettings:
+    push 0
+    push 0
+    push msgerr.ChangeDisplaySettings
+    push 0
+    call [MessageBoxA]
+    jmp chng.exit
+  error.EnumDisplaySettings:
+    push 0
+    push 0
+    push msgerr.EnumDisplaySettings
+    push 0
+    call [MessageBoxA]
+    jmp chng.exit
 
 GLMainLoop: ; params: no
             ; return: no
@@ -285,6 +316,19 @@ GLMainLoop: ; params: no
   retn
 
   GLDestroy:
+    ; restore display settings
+    push DEVMODE
+    push ENUM_CURRENT_SETTINGS
+    push 0
+    call [EnumDisplaySettingsA]
+    mov eax, [curr_disp_res]
+    mov dword [DEVMODE.dmPelsWidth], eax
+    mov eax, [curr_disp_res+4]
+    mov dword [DEVMODE.dmPelsHeight], eax
+    push CDS_UPDATEREGISTRY
+    push DEVMODE
+    call [ChangeDisplaySettingsA]
+    
     push dword [hwnd]
     call [DestroyWindow]
     test eax, eax
@@ -365,30 +409,12 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   jz error.wnd
 
   mov [hwnd], eax
-  call GLChangeResolution
+
   exit:
     leave
     retn 12
 
   error:
-    .cds_test
-      push 0
-      push 0
-      push msgerr.cds_test
-      push 0
-      jmp .msgbox    
-    .ChangeDisplaySettings:
-      push 0
-      push 0
-      push msgerr.ChangeDisplaySettings
-      push 0
-      jmp .msgbox    
-    .EnumDisplaySettings:
-      push 0
-      push 0
-      push msgerr.EnumDisplaySettings
-      push 0
-      jmp .msgbox    
     .SetPixelFormat:
       push 0
       push 0
