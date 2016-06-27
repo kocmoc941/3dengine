@@ -29,7 +29,7 @@ segment .data use32 align=1
     .ChoosePixelFormat: db 'ChoosePixelFormat',0
     .SetPixelFormat: db 'SetPixelFormat',0
     .EnumDisplaySettings: db 'EnumDisplaySettings',0
-    .ChangeDisplaySettings:    db "ChangeDisplaySettings",0
+    .ChangeDisplaySettings: db "ChangeDisplaySettings",0
     .cds_test: db 'CDS_TEST not pass',0
 
   wnd_size: equ dword WNDCLASSEX.wndsize
@@ -147,7 +147,7 @@ DLLMain: ; params: histance/reason/reserved
     retn 12
 
 ChangePixelFormat: ; params: no
-                 ; return: no
+                   ; return: no
   ; clear
   mov eax, px_size
   mov ecx, 2
