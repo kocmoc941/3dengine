@@ -1,4 +1,4 @@
-;%define __DEBUG__
+﻿;%define __DEBUG__
 
 ; graphical module for opengl rendering
 ; calling convention is stdcall
@@ -9,8 +9,12 @@
 GLOBAL DLLMain
 EXPORT GLCreateWindow
 EXPORT GLMainLoop
-EXPORT GetScreenWH
+EXPORT GLGetScreenWH
 EXPORT GLChangeResolution
+
+;//TODO
+;EXPORT GLGetDC
+;EXPORT GLChangeFullscreen
 
 %define wndeax(arg) mov [WNDCLASSEX.%+arg], eax
 %define pxeax(arg) mov [PIXELFORMAT.%+arg], eax
@@ -349,7 +353,7 @@ GLMainLoop: ; params: no
       call [MessageBoxA]
       jmp GLMainLoop_exit
 
-GetScreenWH: ; params: no
+GLGetScreenWH: ; params: no
              ; return: ptr struct {LONG width,LONG height}
   xor eax, eax
   push 17 ; SM_CXFULLSCREEN
