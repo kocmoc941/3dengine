@@ -1,4 +1,4 @@
-﻿;%define __DEBUG__
+﻿; %define __DEBUG__
 
 ; graphical module for opengl rendering
 ; calling convention is stdcall
@@ -16,10 +16,11 @@ EXPORT GLChangeResolution
 ;EXPORT GLGetDC
 ;EXPORT GLChangeFullscreen
 
-%define wndeax(arg) mov [WNDCLASSEX.%+arg], eax
-%define pxeax(arg) mov [PIXELFORMAT.%+arg], eax
+%define eaxtownd(arg) mov [WNDCLASSEX.%+arg], eax
+%define eaxtopx(arg) mov [PIXELFORMAT.%+arg], eax
 
 segment .data use32 align=1
+  isFullScreen: db 0
   hwnd: dd 0
   hdc: dd 0
   curr_disp_res: dq 0 ; width+height
@@ -169,25 +170,25 @@ ChangePixelFormat: ; params: no
   
   ; init for ChoosePixelFormat
   mov eax, px_size
-  pxeax(nSize)
+  eaxtopx(nSize)
   mov eax, 1
-  pxeax(nVersion)
+  eaxtopx(nVersion)
   mov eax, PFD_SUPPORT_OPENGL
   or eax, PFD_NEED_PALETTE ; Colors in the palette should be specified according to the values of the cRedBits, cRedShift, cGreenBits, cGreenShift, cBluebits, and cBlueShift members
   or eax, PFD_DOUBLEBUFFER
   or eax, PFD_DRAW_TO_WINDOW
-  pxeax(dwFlags)
+  eaxtopx(dwFlags)
   mov eax, PFD_TYPE_RGBA
-  pxeax(iPixelType)
+  eaxtopx(iPixelType)
   mov eax, 32
-  pxeax(cColorBits)
-  pxeax(cAlphaBits)
+  eaxtopx(cColorBits)
+  eaxtopx(cAlphaBits)
   ;cAccumBits
-  pxeax(cDepthBits)
-  ;pxeax(cStencilBits)
-  ;pxeax(cAuxBuffers)
+  eaxtopx(cDepthBits)
+  ;eaxtopx(cStencilBits)
+  ;eaxtopx(cAuxBuffers)
   mov eax, PFD_MAIN_PLANE
-  pxeax(iLayerType)
+  eaxtopx(iLayerType)
   
   push PIXELFORMAT
   push dword [hwnd]
@@ -213,23 +214,23 @@ GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
                              ; return: 0
   call ChangePixelFormat
   mov eax, wnd_size
-  wndeax(cbSize)
+  eaxtownd(cbSize)
   mov eax, 0x0002 ; CS_HREDRAW
   or eax, 0x0001  ; CS_VREDRAW
-  wndeax(cbStyle)
+  eaxtownd(cbStyle)
   mov eax, [ebp+8] ; ptr lpfnWndProc
-  wndeax(lpfnWndProc)
+  eaxtownd(lpfnWndProc)
   xor eax, eax
-  wndeax(cbClsExtra)
-  wndeax(cbWndExtra)
-  ;wndeax(hInstance) ; receive from in DLLMain
-  wndeax(hIcCurBr)
-  wndeax(lpszMenuName)
-  wndeax(lpszMenuName)
+  eaxtownd(cbClsExtra)
+  eaxtownd(cbWndExtra)
+  ;eaxtownd(hInstance) ; receive from in DLLMain
+  eaxtownd(hIcCurBr)
+  eaxtownd(lpszMenuName)
+  eaxtownd(lpszMenuName)
   mov eax, cl_name
-  wndeax(lpszClassName)
+  eaxtownd(lpszClassName)
   xor eax, eax
-  wndeax(hIconSm)
+  eaxtownd(hIconSm)
   retn
 
 UnloadClass: ; params: no
@@ -254,7 +255,7 @@ GLChangeResolution: ; params: width{long}/height{long}
   call [EnumDisplaySettingsA]
   test eax, eax
   jz error.EnumDisplaySettings
-  
+
   ;save current settings
   mov edx, dword [DEVMODE.dmPelsWidth]
   mov dword [curr_disp_res], edx
@@ -275,6 +276,12 @@ GLChangeResolution: ; params: width{long}/height{long}
   call [ChangeDisplaySettingsA]
   test eax, eax ; DISP_CHANGE_SUCCESSFUL = 0
   jnz error.ChangeDisplaySettings
+  ; //TODO: change if flag is true, else change to window [.*;!!! for test !!!]
+  ; for fast delete, is the line as regexp:".*;!!! for test !!!.*" may be replaced on empty line
+  push CDS_FULLSCREEN;!!! for test !!!
+  push DEVMODE;!!! for test !!!
+  call [ChangeDisplaySettingsA];!!! for test !!!
+  
   chng.exit:
   retn 8
 
@@ -299,6 +306,25 @@ GLChangeResolution: ; params: width{long}/height{long}
     push 0
     call [MessageBoxA]
     jmp chng.exit
+
+GLChangeFullscreen: ; params: needFullscreen{bool}
+					; return: no
+	mov al, byte [isFullScreen]
+	test al, al
+	xor al, 01b
+	jnz .window
+	push CDS_FULLSCREEN
+	jmp .next
+	.window:
+	push 0
+	.next:
+	push DEVMODE
+    call [ChangeDisplaySettingsA]
+	test eax, eax
+	push $; GLChangeResolution use 2 params 2*4 bytes
+	jz error.ChangeDisplaySettings ; use err from GLChangeResolution
+	add esp, 4
+	retn 4
 
 GLMainLoop: ; params: no
             ; return: no

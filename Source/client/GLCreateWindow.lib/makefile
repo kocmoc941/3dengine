@@ -11,18 +11,18 @@ OBJFILE = cogl.obj
 OUTFILE = ../bin/cogl_golink.dll
 
 USAGE: 
-  @echo "USAGE: make compile"
-  @echo "       make clean"
+	@echo "USAGE: make compile"
+	@echo "       make clean"
 
 compile: $(OUTFILE)
 
 $(OUTFILE) : $(OBJFILE)
-  @$(LINKER) $? $(LFLAGS) $(EXTERNDLL)
+	@$(LINKER) $? $(LFLAGS) $(EXTERNDLL)
   
 $(OBJFILE) : main.asm
-  @$(COMPILER) $(CFLAGS) $? -o$@
+	@$(COMPILER) $(CFLAGS) $? -o$@
   
 clean:
-  rm -rdf *.obj *.dll
+	rm -rdf *.obj *.dll
 
 rebuild: clean compile
