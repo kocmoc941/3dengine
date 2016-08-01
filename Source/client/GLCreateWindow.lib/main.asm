@@ -380,7 +380,7 @@ GLMainLoop: ; params: no
       jmp GLMainLoop_exit
 
 GLGetScreenWH: ; params: no
-             ; return: ptr struct {LONG width,LONG height}
+			   ; return: ptr struct {LONG width,LONG height}
   xor eax, eax
   push 17 ; SM_CXFULLSCREEN
   call [GetSystemMetrics]
