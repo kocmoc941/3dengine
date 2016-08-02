@@ -1,4 +1,4 @@
-п»ї; %define __DEBUG__
+; %define __DEBUG__
 
 ; graphical module for opengl rendering
 ; calling convention is stdcall
@@ -18,6 +18,7 @@ EXPORT GLChangeResolution
 
 %define eaxtownd(arg) mov [WNDCLASSEX.%+arg], eax
 %define eaxtopx(arg) mov [PIXELFORMAT.%+arg], eax
+%define retfree(count) retn %+count
 
 segment .data use32 align=1
   isFullScreen: db 0
@@ -128,21 +129,21 @@ DEVMODE:
   .dmPelsHeight: resd 1
   .dmDisplayFlags: resd 1
   .dmDisplayFrequency: resd 1
-  ; С‚РѕР»СЊРєРѕ РґР»СЏ Windows 95, 98, 2000
+  ; только для Windows 95, 98, 2000
   ;.dmICMMethod As Long
   ;.dmICMIntent As Long
   ;.dmMediaType As Long
   ;.dmDitherType As Long
   ;.dmReserved1 As Long
   ;.dmReserved2 As Long
-  ; С‚РѕР»СЊРєРѕ РґР»СЏ Windows 2000
+  ; только для Windows 2000
   ;.dmPanningWidth As Long
   ;.dmPanningHeight As Long
 
 segment .text use32 align=1
 DLLMain: ; params: histance/reason/reserved
          ; return: 1
-  cmp [esp+8], dword 1 ; DLL_PROCESS_ATTACH
+  cmp [esp+8], byte 1 ; DLL_PROCESS_ATTACH
   jne dllexit
     mov eax, [esp+4]
     mov [WNDCLASSEX.hInstance], eax
@@ -156,7 +157,7 @@ ChangePixelFormat: ; params: no
   ; clear
   mov eax, px_size
   mov ecx, 2
-  div dword ecx
+  div ecx
   mov ecx, eax
   %ifdef __DEBUG__
   int3
@@ -189,18 +190,19 @@ ChangePixelFormat: ; params: no
   ;eaxtopx(cAuxBuffers)
   mov eax, PFD_MAIN_PLANE
   eaxtopx(iLayerType)
-  
-  push PIXELFORMAT
-  push dword [hwnd]
+
   call [GetDC]
   test eax, eax
   jz error.dc
   mov [hdc], eax
+
+  push PIXELFORMAT
+  push dword [hwnd]
   push eax
   call [ChoosePixelFormat]
   test eax, eax
   jz error.ChoosePixelFormat
-  
+
   push PIXELFORMAT
   push eax ; format from ChoosePixelFormat
   push dword [hdc]
@@ -486,5 +488,5 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
       jmp .msgbox
     .msgbox:
       call [MessageBoxA]
-      xor eax, eax
-    jmp exit
+    ;retfree(edx)
+  jmp exit
