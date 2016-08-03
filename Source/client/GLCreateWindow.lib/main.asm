@@ -18,9 +18,13 @@ EXPORT GLChangeResolution
 
 %define eaxtownd(arg) mov [WNDCLASSEX.%+arg], eax
 %define eaxtopx(arg) mov [PIXELFORMAT.%+arg], eax
-%define retfree(count) retn %+count
+
+%define freeparamsb mov [paramsforfree], byte 0
+%define addparamsb(bytes) add byte[paramsforfree], %+bytes
+%define subparamsb(bytes) sub byte[paramsforfree], %+bytes
 
 segment .data use32 align=1
+  paramsforfree db 0
   isFullScreen: db 0
   hwnd: dd 0
   hdc: dd 0
@@ -152,8 +156,8 @@ DLLMain: ; params: histance/reason/reserved
     sete al
     retn 12
 
-ChangePixelFormat: ; params: no
-                   ; return: no
+GLCreateWindow_InitWndClass_ChangePixelFormat: ; params: no
+											   ; return: no
   ; clear
   mov eax, px_size
   mov ecx, 2
@@ -214,7 +218,9 @@ ChangePixelFormat: ; params: no
 
 GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
                              ; return: 0
-  call ChangePixelFormat
+  addparamsb(4) ; call
+  call GLCreateWindow_InitWndClass_ChangePixelFormat
+  subparamsb(4)
   mov eax, wnd_size
   eaxtownd(cbSize)
   mov eax, 0x0002 ; CS_HREDRAW
@@ -401,8 +407,6 @@ GLGetScreenWH: ; params: no
 
 GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y,LONG width,LONG height}, ptr wndname
                 ; return: handle window {HWND}
-  push ebp
-  mov ebp, esp
   mov ebx, [ebp+12] ; pos in RECT
   mov eax, [ebx+0]
   mov [WNDPOS.x], eax
@@ -413,8 +417,10 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   mov eax, [ebx+12]
   mov [WNDPOS.height], eax
 
+  freeparamsb
+  addparamsb(12+4) ; params + call
   call GLCreateWindow_InitWndClass
-
+  subparamsb(4)
   push WNDCLASSEX
   call [RegisterClassExA]
   test eax,eax
@@ -443,7 +449,6 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   mov [hwnd], eax
 
   exit:
-    leave
     retn 12
 
   error:
@@ -489,4 +494,6 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
     .msgbox:
       call [MessageBoxA]
     ;retfree(edx)
-  jmp exit
+  mov edx, [esp]
+  add esp, paramsforfree
+  jmp edx
