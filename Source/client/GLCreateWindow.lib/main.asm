@@ -501,6 +501,5 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
     .msgbox:
       call [MessageBoxA]
     ;retfree(edx)
-  mov edx, [addrforexit]
   add esp, paramsforfree
   jmp [addrforexit]
