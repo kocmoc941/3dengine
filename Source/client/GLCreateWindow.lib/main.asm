@@ -171,7 +171,7 @@ GLCreateWindow_InitWndClass_ChangePixelFormat: ; params: no
   cld
   xor eax, eax
   mov edi, PIXELFORMAT
-  repne stosw
+  repne stosd
   popf
   
   ; init for ChoosePixelFormat
@@ -227,7 +227,7 @@ GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
   mov eax, 0x0002 ; CS_HREDRAW
   or eax, 0x0001  ; CS_VREDRAW
   eaxtownd(cbStyle)
-  mov eax, [ebp+8] ; ptr lpfnWndProc
+  mov eax, [esp+4+4] ; ptr lpfnWndProc
   eaxtownd(lpfnWndProc)
   xor eax, eax
   eaxtownd(cbClsExtra)
@@ -444,7 +444,7 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   mov eax, 0x00000000 ; overload
   or eax, 0x00080000 ; SYSMENU
   push eax ; style
-  push dword [ebp+16]
+  push dword [esp+12] ; wndname
   push cl_name
   mov eax, 0200h ; clientedge
   or eax, 0100h ; windowdedge
