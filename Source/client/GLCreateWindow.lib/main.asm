@@ -19,11 +19,12 @@ EXPORT GLChangeResolution
 %define eaxtownd(arg) mov [WNDCLASSEX.%+arg], eax
 %define eaxtopx(arg) mov [PIXELFORMAT.%+arg], eax
 
-%define freeparamsb mov [paramsforfree], byte 0
-%define addparamsb(bytes) add byte[paramsforfree], %+bytes
-%define subparamsb(bytes) sub byte[paramsforfree], %+bytes
+%define clearfreeb mov [paramsforfree], byte 0
+%define addforfreeb(bytes) add byte[paramsforfree], %+bytes
+%define subforfreeb(bytes) sub byte[paramsforfree], %+bytes
 
 segment .data use32 align=1
+  addrforexit dd 0
   paramsforfree db 0
   isFullScreen: db 0
   hwnd: dd 0
@@ -218,9 +219,9 @@ GLCreateWindow_InitWndClass_ChangePixelFormat: ; params: no
 
 GLCreateWindow_InitWndClass: ; params: no, but use params GLCreateWindow
                              ; return: 0
-  addparamsb(4) ; call
+  addforfreeb(4) ; call
   call GLCreateWindow_InitWndClass_ChangePixelFormat
-  subparamsb(4)
+  subforfreeb(4)
   mov eax, wnd_size
   eaxtownd(cbSize)
   mov eax, 0x0002 ; CS_HREDRAW
@@ -257,6 +258,8 @@ UnloadClass: ; params: no
 
 GLChangeResolution: ; params: width{long}/height{long}
                     ; return: no
+  mov eax, [esp]
+  mov [addrforexit], eax
   push DEVMODE
   push ENUM_CURRENT_SETTINGS
   push 0
@@ -317,6 +320,8 @@ GLChangeResolution: ; params: width{long}/height{long}
 
 GLChangeFullscreen: ; params: needFullscreen{bool}
 					; return: no
+    mov eax, [esp]
+    mov [addrforexit], eax
 	mov al, byte [isFullScreen]
 	test al, al
 	xor al, 01b
@@ -407,7 +412,9 @@ GLGetScreenWH: ; params: no
 
 GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y,LONG width,LONG height}, ptr wndname
                 ; return: handle window {HWND}
-  mov ebx, [ebp+12] ; pos in RECT
+  mov eax, [esp]
+  mov [addrforexit], eax
+  mov ebx, [esp+8] ; pos RECT
   mov eax, [ebx+0]
   mov [WNDPOS.x], eax
   mov eax, [ebx+4]
@@ -417,10 +424,10 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
   mov eax, [ebx+12]
   mov [WNDPOS.height], eax
 
-  freeparamsb
-  addparamsb(12+4) ; params + call
+  clearfreeb
+  addforfreeb(12+4) ; params + call
   call GLCreateWindow_InitWndClass
-  subparamsb(4)
+  subforfreeb(4)
   push WNDCLASSEX
   call [RegisterClassExA]
   test eax,eax
@@ -494,6 +501,6 @@ GLCreateWindow: ; params: ptr lpfnWndProc, ptr struct RECT{LONG pos_x,LONG pos_y
     .msgbox:
       call [MessageBoxA]
     ;retfree(edx)
-  mov edx, [esp]
+  mov edx, [addrforexit]
   add esp, paramsforfree
-  jmp edx
+  jmp [addrforexit]
