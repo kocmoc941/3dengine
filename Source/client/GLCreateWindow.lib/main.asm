@@ -161,7 +161,7 @@ GLCreateWindow_InitWndClass_ChangePixelFormat: ; params: no
 											   ; return: no
   ; clear
   mov eax, px_size
-  mov ecx, 2
+  mov ecx, 4
   div ecx
   mov ecx, eax
   %ifdef __DEBUG__
